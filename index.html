@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaBot AI - Formation Pharmaceutique Intelligente</title>
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d4ff;
+            --secondary: #8b5cf6;
+            --accent: #f72585;
+            --dark: #0a0e27;
+            --darker: #050816;
+            --light: #ffffff;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--darker);
+            color: var(--light);
+            overflow-x: hidden;
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Light Mode */
+        body.light-mode {
+            --darker: #f5f7fa;
+            --dark: #e8ecf1;
+            --light: #1a1a2e;
+            --glass: rgba(255, 255, 255, 0.7);
+        }
+
+        body.light-mode .bg-gradient {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 50%, #dfe4ea 100%);
+        }
+
+        body.light-mode .particle {
+            background: var(--secondary);
+        }
+
+        body.light-mode nav {
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .glass-card,
+        body.light-mode .feature-card,
+        body.light-mode .chatbot-container {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .card-description {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        body.light-mode footer {
+            background: rgba(255, 255, 255, 0.8);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .footer-section p,
+        body.light-mode .footer-section a {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        body.light-mode .copyright {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        body.light-mode .stat-label {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Loading Animation */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--darker);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border: 4px solid transparent;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .loader-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border: 4px solid transparent;
+            border-top-color: var(--secondary);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite reverse;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Background Effects */
+        .bg-gradient {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #1a1a3e 100%);
+            z-index: -2;
+        }
+
+        .particles {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            33% { transform: translateY(-100px) translateX(50px); }
+            66% { transform: translateY(-50px) translateX(-50px); }
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 32px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        .theme-toggle::before {
+            content: '🌙';
+            position: absolute;
+            left: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        body.light-mode .theme-toggle::before {
+            content: '☀️';
+            left: calc(100% - 28px);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 5%;
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        nav.scrolled {
+            padding: 15px 5%;
+            background: rgba(10, 14, 39, 0.95);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 10px var(--primary)); }
+            50% { filter: drop-shadow(0 0 20px var(--secondary)); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 100px 5% 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
+        }
+
+        .hero-content {
+            max-width: 1000px;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(40px, 8vw, 80px);
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 5s ease infinite;
+            background-size: 200% 200%;
+            line-height: 1.2;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .typing-text {
+            font-size: clamp(18px, 3vw, 28px);
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.5s forwards;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 18px 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 18px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3); }
+            50% { box-shadow: 0 10px 50px rgba(139, 92, 246, 0.5); }
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .cta-button:hover::before {
+            opacity: 1;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5);
+        }
+
+        .cta-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Section Styling */
+        section {
+            padding: 120px 5%;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: clamp(36px, 6vw, 60px);
+            font-weight: 900;
+            margin-bottom: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s;
+        }
+
+        .section-title.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Discover Section */
+        .discover-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .glass-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3);
+            border-color: var(--primary);
+        }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .glass-card:hover .card-icon {
+            animation: spin 0.6s ease-in-out;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .card-description {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 20px;
+            padding: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .feature-card.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(139, 92, 246, 0.4);
+            border-color: var(--secondary);
+        }
+
+        .feature-emoji {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--light);
+        }
+
+        /* Chatbot Integration Section */
+        .chatbot-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+            box-shadow: 0 30px 90px rgba(0, 212, 255, 0.2);
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.8s;
+            min-height: 600px;
+        }
+
+        #n8n-chat {
+            width: 100%;
+            min-height: 600px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .chatbot-container.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .chatbot-container::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            z-index: -1;
+            animation: borderRotate 3s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .chatbot-placeholder {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .dot {
+            width: 15px;
+            height: 15px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: loadingDots 1.4s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+            background: var(--secondary);
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+            background: var(--accent);
+        }
+
+        @keyframes loadingDots {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 60px auto 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 30px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s;
+        }
+
+        .stat-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stat-number {
+            font-size: 60px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(5, 8, 22, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 60px 5% 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .footer-wave {
+            position: absolute;
+            top: -50px;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120'%3E%3Cpath d='M321.39 56.44c58-10.79 114.16-30.13 172-41.86 82.39-16.72 168.19-17.73 250.45-.39C823.78 31 906.67 72 985.66 92.83c70.05 18.48 146.53 26.09 214.34 3V0H0v27.35a600.21 600.21 0 00321.39 29.09z' fill='rgba(5, 8, 22, 0.8)'/%3E%3C/svg%3E") no-repeat;
+            background-size: cover;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .social-link:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.4);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding: 80px 5% 40px;
+            }
+
+            section {
+                padding: 80px 5%;
+            }
+
+            .glass-card,
+            .feature-card,
+            .chatbot-container {
+                padding: 30px 20px;
+            }
+
+            .stat-number {
+                font-size: 40px;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Selection Color */
+        ::selection {
+            background: var(--primary);
+            color: var(--darker);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div id="loader">
+        <div class="loader-content">
+            <div class="loader-ring"></div>
+            <p style="color: var(--primary); font-size: 18px; font-weight: 600;">Chargement de l'expérience...</p>
+        </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" onclick="toggleTheme()"></div>
+
+    <!-- Background Effects -->
+    <div class="bg-gradient"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-content">
+            <div class="logo">PharmaBot AI</div>
+            <ul class="nav-links">
+                <li><a href="#hero">Accueil</a></li>
+                <li><a href="#discover">Découvrir</a></li>
+                <li><a href="#features">Fonctionnalités</a></li>
+                <li><a href="#chatbot">Assistant</a></li>
+                <li><a href="#stats">Pourquoi</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-grid"></div>
+        <div class="hero-content">
+            <h1>L'Intelligence Artificielle au Service de Votre Formation</h1>
+            <p class="typing-text">Votre assistant de formation pharmaceutique intelligent, disponible 24/7</p>
+            <a href="#chatbot" class="cta-button">
+                <span>Découvrir l'Assistant ✨</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Discover Section -->
+    <section id="discover">
+        <h2 class="section-title">Découvrez Votre Assistant Intelligent</h2>
+        <div class="discover-grid">
+            <div class="glass-card">
+                <div class="card-icon">💬</div>
+                <h3 class="card-title">Posez TOUTES vos questions</h3>
+                <p class="card-description">Un espace dédié où vous pouvez interroger votre assistant sur n'importe quel sujet de formation pharmaceutique, sans limitation.</p>
+            </div>
+            <div class="glass-card">
+                <div class="card-icon">🎓</div>
+                <h3 class="card-title">Chatbot Spécialisé</h3>
+                <p class="card-description">Dédié exclusivement à la formation continue des pharmaciens, avec une expertise pointue sur les nouvelles missions.</p>
+            </div>
+            <div class="glass-card">
+                <div class="card-icon">🎯</div>
+                <h3 class="card-title">Expert des Nouvelles Missions</h3>
+                <p class="card-description">Maîtrise parfaite de toutes les nouvelles missions du pharmacien et des évolutions réglementaires récentes.</p>
+            </div>
+            <div class="glass-card">
+                <div class="card-icon">📊</div>
+                <h3 class="card-title">Basé sur vos Supports</h3>
+                <p class="card-description">Répond exclusivement à partir du contenu officiel de vos supports de formation (slides et documents pédagogiques).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features">
+        <h2 class="section-title">Des Fonctionnalités Exceptionnelles</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-emoji">✨</span>
+                <h3 class="feature-title">Réponses Instantanées</h3>
+                <p class="card-description">Obtenez des réponses précises et détaillées en quelques secondes, où que vous soyez.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-emoji">🎯</span>
+                <h3 class="feature-title">100% Spécialisé</h3>
+                <p class="card-description">Formation pharmaceutique uniquement, pour des réponses toujours pertinentes et contextualisées.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-emoji">🚀</span>
+                <h3 class="feature-title">Disponible 24/7</h3>
+                <p class="card-description">Votre assistant est disponible à tout moment, jour et nuit, partout dans le monde.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-emoji">📚</span>
+                <h3 class="feature-title">Supports Officiels</h3>
+                <p class="card-description">Toutes les réponses proviennent de vos documents pédagogiques officiels et validés.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-emoji">🔒</span>
+                <h3 class="feature-title">Sécurisé & Confidentiel</h3>
+                <p class="card-description">Vos conversations et données sont protégées avec les plus hauts standards de sécurité.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-emoji">💡</span>
+                <h3 class="feature-title">Contexte Intelligent</h3>
+                <p class="card-description">Comprend le contexte de vos questions pour des réponses toujours adaptées à votre besoin.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chatbot Integration -->
+    <section id="chatbot">
+        <h2 class="section-title">Votre Assistant IA</h2>
+        <div class="chatbot-container">
+            <div id="n8n-chat"></div>
+        </div>
+    </section>
+
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+        createChat({
+            webhookUrl: 'https://n8n.srv992672.hstgr.cloud/webhook/8141262a-6d9c-43c7-aaac-8c62831db18e/chat'
+        });
+    </script>
+
+    <!-- Stats Section -->
+    <section id="stats">
+        <h2 class="section-title">Pourquoi Choisir Cet Assistant ?</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number" data-target="24">0</span>
+                <p class="stat-label">Heures de disponibilité</p>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" data-target="100">0</span>
+                <p class="stat-label">% Spécialisé Pharma</p>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" data-target="1000">0</span>
+                <p class="stat-label">Questions répondues</p>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" data-target="99">0</span>
+                <p class="stat-label">% Satisfaction</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-wave"></div>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>PharmaBot AI</h3>
+                <p>Votre partenaire intelligent pour la formation pharmaceutique continue.</p>
+                <p style="margin-top: 20px; color: var(--primary); font-weight: 600;">💡 Développé par Innovapharm Consulting</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">📘</a>
+                    <a href="#" class="social-link">🐦</a>
+                    <a href="#" class="social-link">💼</a>
+                    <a href="#" class="social-link">📧</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Navigation</h3>
+                <a href="#hero">Accueil</a>
+                <a href="#discover">Découvrir</a>
+                <a href="#features">Fonctionnalités</a>
+                <a href="#chatbot">Assistant</a>
+            </div>
+            <div class="footer-section">
+                <h3>Innovapharm Consulting</h3>
+                <a href="#">À propos d'Innovapharm</a>
+                <a href="#">Nos services</a>
+                <a href="#">Portfolio</a>
+                <a href="#">Nous contacter</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <a href="#">contact@pharmabot.ai</a>
+                <a href="#">contact@innovapharm-consulting.fr</a>
+                <a href="#">Politique de confidentialité</a>
+                <a href="#">Mentions légales</a>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>© 2025 PharmaBot AI - Développé avec ❤️ par <strong style="color: var(--primary);">Innovapharm Consulting</strong> pour les pharmaciens.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1500);
+        });
+
+        // Particles Generator
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 5 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = Math.random() * 20 + 10 + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Intersection Observer for Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section-title, .glass-card, .feature-card, .chatbot-container, .stat-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Animated Counter
+        function animateCounter(element) {
+            const target = parseInt(element.getAttribute('data-target'));
+            const duration = 2000;
+            const step = target / (duration / 16);
+            let current = 0;
+
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    element.textContent = target + (target === 100 || target === 99 ? '' : '');
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 16);
+        }
+
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('.stat-number');
+                    counters.forEach(counter => {
+                        if (!counter.classList.contains('counted')) {
+                            animateCounter(counter);
+                            counter.classList.add('counted');
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.5 });
+
+        counterObserver.observe(document.getElementById('stats'));
+
+        // Theme Toggle
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+        }
+
+        // Smooth Scroll for Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add ripple effect to CTA button
+        document.querySelector('.cta-button').addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.style.position = 'absolute';
+            ripple.style.borderRadius = '50%';
+            ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+            ripple.style.transform = 'scale(0)';
+            ripple.style.animation = 'ripple 0.6s ease-out';
+
+            this.appendChild(ripple);
+
+            setTimeout(() => ripple.remove(), 600);
+        });
+    </script>
+
+    <!-- Initialize n8n Chat -->
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+        createChat({
+            webhookUrl: 'https://n8n.srv992672.hstgr.cloud/webhook/8141262a-6d9c-43c7-aaac-8c62831db18e/chat',
+            target: '#n8n-chat',
+            mode: 'window',
+            showWelcomeScreen: true,
+            initialMessages: [
+                'Bonjour ! 👋',
+                'Je suis votre assistant de formation pharmaceutique.',
+                'Posez-moi toutes vos questions sur les nouvelles missions du pharmacien !'
+            ],
+            i18n: {
+                en: {
+                    title: 'Assistant Formation Pharma',
+                    subtitle: 'Propulsé par Innovapharm Consulting',
+                    footer: '',
+                    getStarted: 'Commencer la conversation',
+                    inputPlaceholder: 'Tapez votre question ici...',
+                }
+            }
+        });
+    </script>
+</body>
+</html>
